@@ -68,7 +68,7 @@ PANOPTO_CLIENT_SECRET=client_secret
 
 ## Usage Examples
 
-1. Reorder Assignments Alphabetically
+### 1. Reorder Assignments Alphabetically
 
 This script will:
 
@@ -106,7 +106,7 @@ Enter the number of the group to sort alphabetically: 1
 📁 Backup saved to: backup_assignment_group_123_20250624_143011.json
 ```
 
- 2. Merge All Wiki Pages into One File
+### 2. Merge All Wiki Pages into One File
 
 This script:
 
@@ -129,7 +129,7 @@ Sample Output:
 ✅ Merged HTML saved to: merged_canvas_pages_20250624_153002.html
 ```
 
-3. Restore Canvas Pages from Merged HTML
+### 3. Restore Canvas Pages from Merged HTML
 
 This script:
 
@@ -157,7 +157,7 @@ Enter the path to the merged HTML file: merged_canvas_pages_20250624_153002.html
 🆕 Created: Week 1 Overview
 ```
 
-4. Get the Viewer URL for the Panopto Videos in a given Panopto Folder 
+### 4. Get the Viewer URL for the Panopto Videos in a given Panopto Folder 
 
 This script will list the Viewer URLs of all the vidoes in the folder that is identified by folder_id.
 
