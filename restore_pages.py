@@ -25,6 +25,8 @@ def split_merged_html(file_path):
 
     pages = []
     page_titles = soup.find_all("h1")
+
+    print(page_titles)
     
     for i, header in enumerate(page_titles):
         title = header.get_text()

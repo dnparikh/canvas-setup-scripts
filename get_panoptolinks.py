@@ -7,6 +7,7 @@ import urllib3
 import time
 import json
 import os
+import csv
 
 from dotenv import load_dotenv
 
@@ -20,11 +21,13 @@ client_secret = os.getenv("PANOPTO_CLIENT_SECRET")
 #from os.path import dirname, join, abspath
 #sys.path.insert(0, abspath(join(dirname(__file__), '..', 'common')))
 from panopto_oauth2 import PanoptoOAuth2
+from panopto_folders import PanoptoFolders
 
 
 def parse_argument():
     parser = argparse.ArgumentParser(description='Get Panopto Video URLS')
     parser.add_argument('--folder', dest='folder_id', required=True, help='Get folder ID.')
+    parser.add_argument('--filename', dest='filename', required=True, help='Get csv filename to write the output.')
     #parser.add_argument('--client-id', dest='client_id', required=True, help='Client ID of OAuth2 client')
     #parser.add_argument('--client-secret', dest='client_secret', required=True, help='Client Secret of OAuth2 client')
     parser.add_argument('--skip-verify', dest='skip_verify', action='store_true', required=False, help='Skip SSL certificate verification. (Never apply to the production code)')
@@ -56,22 +59,57 @@ def main():
     # folder_id = 'a78dc18b-9a6d-4650-a1f1-b30700752740' # CS311 sandbox
 
     folder_id   = args.folder_id
+    filename    = args.filename
 
     # print('Calling GET /api/v1/folders/{0}/children endpoint'.format(folder_id))
     print('Calling GET /api/v1/folders/{0}/sessions endpoint'.format(folder_id))
-    # url = 'https://{0}/Panopto/api/v1/folders/{1}/children'.format(args.server, folder_id)
-    url = 'https://{0}/Panopto/api/v1/folders/{1}/sessions'.format(server, folder_id)
+    url = 'https://{0}/Panopto/api/v1/folders/{1}/children'.format(server, folder_id)
+    #url = 'https://{0}/Panopto/api/v1/folders/{1}/sessions'.format(server, folder_id)
+    print(url)
+    #resp=PanoptoFolders.get_sessions(self, folder_id)
     resp = requests_session.get(url = url)
     if inspect_response_is_unauthorized(resp):
         # Re-authorization
         print('Re-authorization required')
         authorization(requests_session, oauth2)
     data = resp.json() # parse JSON format response
-    print(json.dumps(data, indent=2, sort_keys=True))
-    for folder in data["Results"]:
-        print('  {0}: {1} {2}'.format(folder['Id'], folder['Name'], folder['Urls']['ViewerUrl']))
-    time.sleep(1)
-    print('done!')
+    #print(data)
+    #print(json.dumps(data, indent=2, sort_keys=True))
+
+    with open(filename, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+
+        # CSV HEADER
+        writer.writerow([
+            "FolderId",
+            "FolderName",
+            "SessionId",
+            "SessionName",
+            "ViewerUrl"
+        ])
+
+        for folder in data["Results"]:
+            # print('  {0}: {1} {2}'.format(folder['Id'], folder['Name'], folder['Urls']['ViewerUrl']))
+            print('  {0}: {1}'.format(folder['Id'], folder['Name']))
+            subfolder_id = folder['Id']
+            url = 'https://{0}/Panopto/api/v1/folders/{1}/sessions'.format(server,
+subfolder_id)
+            resp = requests_session.get(url = url)
+            videos = resp.json() # parse JSON format response
+            #print('sessions dump')
+            #print(json.dumps(videos, indent=2, sort_keys=True))
+            for video in videos["Results"]:
+                print('  {0}, {1}, {2}'.format(video['Id'], video['Name'], video['Urls']['ViewerUrl']))
+                # print(json.dumps(data, indent=2, sort_keys=True))
+                writer.writerow([
+                    folder["Id"],
+                    folder["Name"],
+                    video["Id"],
+                    video["Name"],
+                    video["Urls"]["ViewerUrl"]
+                ])
+        time.sleep(1)
+        print('done!')
 
 def authorization(requests_session, oauth2):
     # Go through authorization
