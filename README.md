@@ -232,8 +232,6 @@ COURSE_TIMEZONE
 
 from your `.env` file.
 
----
-
 ### 6. Update Assignment Dates from CSV
 
 This script will:
@@ -278,9 +276,7 @@ Success: 3
 Failed:  0
 ```
 
----
-
-## 4. Dry Run Mode
+#### Dry Run Mode
 
 Before making changes to Canvas, you can preview all updates using dry-run mode.
 
@@ -323,9 +319,7 @@ No changes will be made.
 ==============================
 ```
 
----
-
-## Timezone Configuration
+#### Timezone Configuration
 
 Assignment dates in the CSV should be entered using the course's local timezone.
 
