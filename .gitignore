@@ -1,6 +1,11 @@
 # vim files
 *.swp
 
+#output files
+*.html
+*.csv
+*.bak
+
 #cached files
 *.cache
 

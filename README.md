@@ -177,6 +177,191 @@ ccfd10f3-5bf5-45fe-a769-b30700790167: 01.01.00 Building Blocks of Boolean Logic 
 125b3c1b-534a-459d-8e10-b3070079019a: 01.01.01 Logical Operators https://utexas.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=125b3c1b-534a-459d-8e10-b3070079019a
 43aeded6-471b-4199-92f7-b30700790221: 01.01.02 Truth Tables https://utexas.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=43aeded6-471b-4199-92f7-b30700790221
 ```
+
+### 5. Export Assignment Dates to CSV
+
+This script will:
+
+- List all assignment groups in the course
+
+- Prompt you to select one group
+
+- Export all assignments in the selected group to a CSV file
+
+- Convert Canvas UTC timestamps to your configured course timezone
+
+- Generate a spreadsheet that can be edited in Excel, LibreOffice, or Google Sheets
+
+- Include assignment IDs required for updating assignments later
+
+Run it:
+
+```bash
+python export_assignments.py
+```
+
+Sample Output:
+
+```text
+Assignment Groups:
+
+1. Homework
+2. Labs
+3. Quizzes
+
+Select group: 1
+
+CSV exported to:
+assignments_12345_20260530_142500.csv
+```
+
+Sample CSV:
+
+```csv
+assignment_id,assignment_name,due_at,unlock_at,lock_at
+10001,Homework 1,2026-09-01 23:59,2026-08-25 00:00,2026-09-08 23:59
+10002,Homework 2,2026-09-08 23:59,2026-09-01 00:00,2026-09-15 23:59
+10003,Homework 3,2026-09-15 23:59,2026-09-08 00:00,2026-09-22 23:59
+```
+
+The exported dates are displayed in the timezone specified by:
+
+```text
+COURSE_TIMEZONE
+```
+
+from your `.env` file.
+
+---
+
+### 6. Update Assignment Dates from CSV
+
+This script will:
+
+- Read assignment information from a CSV file
+
+- Convert local course times to Canvas UTC timestamps
+
+- Update Due Dates (`due_at`)
+
+- Update Available From dates (`unlock_at`)
+
+- Update Until dates (`lock_at`)
+
+- Prompt for confirmation before making any changes
+
+- Display success and failure counts after processing
+
+Run it:
+
+```bash
+python update_assignment_dates.py assignments.csv
+```
+
+Sample Output:
+
+```text
+Assignments to update:
+
+Homework 1 (ID 10001)
+Homework 2 (ID 10002)
+Homework 3 (ID 10003)
+
+Proceed with updates? (y/n): y
+
+✅ Updated 10001
+✅ Updated 10002
+✅ Updated 10003
+
+Finished.
+Success: 3
+Failed:  0
+```
+
+---
+
+## 4. Dry Run Mode
+
+Before making changes to Canvas, you can preview all updates using dry-run mode.
+
+This mode:
+
+- Reads the CSV file
+
+- Performs timezone conversion
+
+- Displays all assignment updates
+
+- Does not make any Canvas API calls
+
+- Allows verification before modifying a live course
+
+Run it:
+
+```bash
+python update_assignment_dates.py assignments.csv --dry-run
+```
+
+Sample Output:
+
+```text
+Assignments Found:
+
+Homework 1 (ID 10001)
+    Due At:    2026-09-01 23:59
+    Unlock At: 2026-08-25 00:00
+    Lock At:   2026-09-08 23:59
+
+Homework 2 (ID 10002)
+    Due At:    2026-09-08 23:59
+    Unlock At: 2026-09-01 00:00
+    Lock At:   2026-09-15 23:59
+
+==============================
+DRY RUN MODE
+No changes will be made.
+==============================
+```
+
+---
+
+## Timezone Configuration
+
+Assignment dates in the CSV should be entered using the course's local timezone.
+
+Example `.env` configuration:
+
+```text
+COURSE_TIMEZONE=America/Chicago
+```
+
+Supported examples:
+
+```text
+COURSE_TIMEZONE=America/New_York
+COURSE_TIMEZONE=America/Chicago
+COURSE_TIMEZONE=America/Denver
+COURSE_TIMEZONE=America/Los_Angeles
+COURSE_TIMEZONE=UTC
+```
+
+CSV dates should use the format:
+
+```text
+YYYY-MM-DD HH:MM
+```
+
+Example:
+
+```text
+2026-09-01 23:59
+```
+
+The script automatically converts these values to the UTC format required by Canvas before sending updates through the API.
+
+
+
+
 ## Best Practices & Warnings
 
 - 💾 Always back up your Canvas content before running scripts that make changes.
